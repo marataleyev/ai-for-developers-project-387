@@ -34,8 +34,10 @@ public class CalendarService {
             Instant end = current.plus(Duration.ofMinutes(eventType.getDuration()));
             Instant slotStart = current;
             
+            Instant slotEnd = end;
             boolean isAvailable = existingBookings.stream()
-                    .noneMatch(booking -> booking.getStartTime().equals(slotStart));
+                    .noneMatch(booking -> booking.getStartTime().isBefore(slotEnd)
+                            && booking.getEndTime().isAfter(slotStart));
             
             slots.add(new SlotDTO(slotStart, end, isAvailable));
             current = end;
