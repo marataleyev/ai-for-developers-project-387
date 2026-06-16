@@ -41,3 +41,7 @@ cd frontend && npm run mock   # http://localhost:4010
 - Package manager is `npm@11.17.0` (specified in root `packageManager`).
 - Backend uses `ddl-auto: create-drop` — data is ephemeral across restarts, re-seeded from `data.sql`.
 - No CI workflows or GitHub Actions present in the repo.
+
+
+## 
+- коммиты в PR оформлять по Conventional Commits 
