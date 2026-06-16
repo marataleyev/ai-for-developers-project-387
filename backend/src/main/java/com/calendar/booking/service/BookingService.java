@@ -7,6 +7,8 @@ import com.calendar.booking.repository.BookingRepository;
 import com.calendar.booking.repository.EventTypeRepository;
 import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -17,6 +19,8 @@ import java.util.UUID;
 @Service
 @RequiredArgsConstructor
 public class BookingService {
+    
+    private static final Logger log = LoggerFactory.getLogger(BookingService.class);
     
     private final BookingRepository bookingRepository;
     private final EventTypeRepository eventTypeRepository;
@@ -42,17 +46,26 @@ public class BookingService {
             throw new IllegalArgumentException("Booking must be within the next 14 days");
         }
         
-        // Check slot availability
-        if (bookingRepository.findByStartTime(booking.getStartTime()).isPresent()) {
+        // Compute the new booking's interval [startTime, endTime)
+        Instant startTime = booking.getStartTime();
+        Instant endTime = startTime.plus(Duration.ofMinutes(eventType.getDuration()));
+        
+        // Check slot availability via interval overlap:
+        // existing.startTime < new.endTime AND existing.endTime > new.startTime
+        if (!bookingRepository.findByStartTimeLessThanAndEndTimeGreaterThan(endTime, startTime).isEmpty()) {
+            log.warn("Slot unavailable: booking interval [{}, {}) overlaps an existing booking", startTime, endTime);
             throw new SlotUnavailableException("This slot is already booked");
         }
         
         // Set derived fields
         booking.setId(UUID.randomUUID().toString());
-        booking.setEndTime(booking.getStartTime().plus(Duration.ofMinutes(eventType.getDuration())));
+        booking.setEndTime(endTime);
         booking.setCreatedAt(Instant.now());
         
-        return bookingRepository.save(booking);
+        Booking saved = bookingRepository.save(booking);
+        log.info("Created booking {} for event type {} at interval [{}, {})",
+                saved.getId(), saved.getEventTypeId(), startTime, endTime);
+        return saved;
     }
     
     public void delete(String id) {

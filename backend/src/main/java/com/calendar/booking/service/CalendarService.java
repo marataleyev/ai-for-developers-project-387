@@ -34,8 +34,11 @@ public class CalendarService {
             Instant end = current.plus(Duration.ofMinutes(eventType.getDuration()));
             Instant slotStart = current;
             
+            // A slot is unavailable if it overlaps any existing booking's interval:
+            // existing.startTime < slot.end AND existing.endTime > slot.start
             boolean isAvailable = existingBookings.stream()
-                    .noneMatch(booking -> booking.getStartTime().equals(slotStart));
+                    .noneMatch(booking -> booking.getStartTime().isBefore(end)
+                            && booking.getEndTime().isAfter(slotStart));
             
             slots.add(new SlotDTO(slotStart, end, isAvailable));
             current = end;
