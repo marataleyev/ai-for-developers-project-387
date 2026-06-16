@@ -12,7 +12,7 @@ jobs:
   release-please:
     runs-on: ubuntu-latest
     steps:
-      - uses: googleapis/release-please-action@v6
+      - uses: googleapis/release-please-action@v4
         id: release
         with:
           release-type: simple # или укажите ваш язык, например 'node', 'python', 'go'
