@@ -1,0 +1,231 @@
+openapi: 3.1.0
+info:
+  title: Calendar Booking Service
+  version: 0.0.0
+tags:
+  - name: EventTypes
+  - name: Calendar
+  - name: Bookings
+paths:
+  /bookings:
+    post:
+      operationId: Bookings_create
+      description: Создание бронирования
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Booking'
+      tags:
+        - Bookings
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/Booking'
+  /bookings/{id}:
+    get:
+      operationId: Bookings_read
+      description: Получение конкретного бронирования
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Booking'
+      tags:
+        - Bookings
+    delete:
+      operationId: Bookings_delete
+      description: Отмена бронирования (физическое удаление)
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '204':
+          description: 'There is no content to send for this request, but the headers may be useful. '
+      tags:
+        - Bookings
+  /calendar/slots:
+    get:
+      operationId: Calendar_listSlots
+      description: Получение доступных слотов для бронирования
+      parameters:
+        - name: eventTypeId
+          in: query
+          required: true
+          schema:
+            type: string
+          explode: false
+        - name: from
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date-time
+          explode: false
+        - name: to
+          in: query
+          required: true
+          schema:
+            type: string
+            format: date-time
+          explode: false
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/Slot'
+      tags:
+        - Calendar
+  /event-types:
+    get:
+      operationId: EventTypes_list
+      description: Получение всех типов событий
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: '#/components/schemas/EventType'
+      tags:
+        - EventTypes
+    post:
+      operationId: EventTypes_create
+      description: Создание типа события
+      parameters: []
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventType'
+      tags:
+        - EventTypes
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/EventType'
+  /event-types/{id}:
+    get:
+      operationId: EventTypes_read
+      description: Получение конкретного типа события
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: The request has succeeded.
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/EventType'
+      tags:
+        - EventTypes
+components:
+  schemas:
+    Booking:
+      type: object
+      required:
+        - id
+        - eventTypeId
+        - startTime
+        - endTime
+        - guestName
+        - guestEmail
+        - createdAt
+      properties:
+        id:
+          type: string
+          description: Идентификатор бронирования
+        eventTypeId:
+          type: string
+          description: Идентификатор типа события
+        startTime:
+          type: string
+          format: date-time
+          description: Время начала бронирования
+        endTime:
+          type: string
+          format: date-time
+          description: Время окончания бронирования
+        guestName:
+          type: string
+          description: Имя гостя
+        guestEmail:
+          type: string
+          description: Email гостя
+        createdAt:
+          type: string
+          format: date-time
+          description: Дата и время создания бронирования
+      description: Бронирование
+    EventType:
+      type: object
+      required:
+        - id
+        - title
+        - duration
+        - description
+      properties:
+        id:
+          type: string
+          description: Идентификатор типа события
+        title:
+          type: string
+          description: Название типа события
+        duration:
+          type: integer
+          format: int32
+          description: Длительность в минутах
+        description:
+          type: string
+          description: Описание типа события
+      description: Тип события
+    Slot:
+      type: object
+      required:
+        - startTime
+        - endTime
+        - isAvailable
+      properties:
+        startTime:
+          type: string
+          format: date-time
+          description: Время начала слота
+        endTime:
+          type: string
+          format: date-time
+          description: Время окончания слота
+        isAvailable:
+          type: boolean
+          description: Доступен ли слот для бронирования
+      description: Слот для бронирования (вычисляемый)
