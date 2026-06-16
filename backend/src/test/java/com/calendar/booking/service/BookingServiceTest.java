@@ -14,6 +14,7 @@ import org.mockito.junit.jupiter.MockitoExtension;
 
 import java.time.Duration;
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -48,7 +49,8 @@ class BookingServiceTest {
     @Test
     void create_ShouldSaveBooking_WhenSlotAvailable() {
         when(eventTypeRepository.findById("1")).thenReturn(Optional.of(eventType));
-        when(bookingRepository.findByStartTime(any())).thenReturn(Optional.empty());
+        when(bookingRepository.findByStartTimeLessThanAndEndTimeGreaterThan(any(), any()))
+                .thenReturn(List.of());
         when(bookingRepository.save(any())).thenAnswer(inv -> inv.getArgument(0));
         
         Booking result = bookingService.create(booking);
@@ -62,7 +64,8 @@ class BookingServiceTest {
     @Test
     void create_ShouldThrow_WhenSlotUnavailable() {
         when(eventTypeRepository.findById("1")).thenReturn(Optional.of(eventType));
-        when(bookingRepository.findByStartTime(any())).thenReturn(Optional.of(new Booking()));
+        when(bookingRepository.findByStartTimeLessThanAndEndTimeGreaterThan(any(), any()))
+                .thenReturn(List.of(new Booking()));
         
         assertThrows(SlotUnavailableException.class, () -> bookingService.create(booking));
     }

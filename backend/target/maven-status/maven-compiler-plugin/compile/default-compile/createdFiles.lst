@@ -5,13 +5,13 @@ com/calendar/booking/exception/GlobalExceptionHandler.class
 com/calendar/booking/repository/EventTypeRepository.class
 com/calendar/booking/service/CalendarService.class
 com/calendar/booking/controller/CalendarController.class
-com/calendar/booking/model/EventType.class
-com/calendar/booking/config/CorsConfig.class
 com/calendar/booking/service/BookingService.class
+com/calendar/booking/config/CorsConfig.class
+com/calendar/booking/model/EventType.class
 com/calendar/booking/controller/BookingController.class
-com/calendar/booking/config/WebConfig.class
 com/calendar/booking/exception/SlotUnavailableException.class
+com/calendar/booking/config/WebConfig.class
 com/calendar/booking/controller/EventTypeController.class
 com/calendar/booking/dto/SlotDTO.class
-com/calendar/booking/BookingApplication.class
 com/calendar/booking/service/EventTypeService.class
+com/calendar/booking/BookingApplication.class

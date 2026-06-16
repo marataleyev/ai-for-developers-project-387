@@ -12,4 +12,5 @@ import java.util.Optional;
 public interface BookingRepository extends JpaRepository<Booking, String> {
     Optional<Booking> findByStartTime(Instant startTime);
     List<Booking> findByStartTimeBetween(Instant from, Instant to);
+    List<Booking> findByStartTimeLessThanAndEndTimeGreaterThan(Instant newEnd, Instant newStart);
 }

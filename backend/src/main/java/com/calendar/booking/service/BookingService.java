@@ -42,14 +42,19 @@ public class BookingService {
             throw new IllegalArgumentException("Booking must be within the next 14 days");
         }
         
-        // Check slot availability
-        if (bookingRepository.findByStartTime(booking.getStartTime()).isPresent()) {
+        // Compute the new booking's interval [startTime, endTime)
+        Instant startTime = booking.getStartTime();
+        Instant endTime = startTime.plus(Duration.ofMinutes(eventType.getDuration()));
+        
+        // Check slot availability via interval overlap:
+        // existing.startTime < new.endTime AND existing.endTime > new.startTime
+        if (!bookingRepository.findByStartTimeLessThanAndEndTimeGreaterThan(endTime, startTime).isEmpty()) {
             throw new SlotUnavailableException("This slot is already booked");
         }
         
         // Set derived fields
         booking.setId(UUID.randomUUID().toString());
-        booking.setEndTime(booking.getStartTime().plus(Duration.ofMinutes(eventType.getDuration())));
+        booking.setEndTime(endTime);
         booking.setCreatedAt(Instant.now());
         
         return bookingRepository.save(booking);
